@@ -35,9 +35,11 @@ Processes:1 Threads_per_process:1 Total_threads:1 TotalTime: 401.3383722305298
 """
 from __future__ import unicode_literals, print_function
 from pprint import pprint
-from time import time, sleep
+from time import time, sleep, strftime
 
 from mpms import MPMS, Meta
+
+myprint = lambda s: print("[{showtime}] {s}".format(showtime=strftime("%Y-%m-%d %H:%M:%S"), s=s))
 
 
 def worker(index, t=None):
@@ -50,7 +52,7 @@ def worker(index, t=None):
     总是工作在外部进程的线程中 (即不工作在主进程中)
     """
     sleep(0.2)  # delay 0.2 second
-    print(index, t)
+    #print(index, t)
 
     # worker's return value will be added to product queue, waiting handler to handle
     # you can return any type here (Included the None , of course)
@@ -80,7 +82,7 @@ def collector(meta, result):
     if isinstance(result, Exception):
         return
     index, t = result
-    print("received", index, t, time())
+    #print("received", index, t, time())
     meta.taskid, meta.args, meta.kwargs  # 分别为此任务的 taskid 和 传入的 args kwargs
     meta['want']  # 在 main 中传入的meta字典中的参数
     meta.mpms  # meta.mpms 中保存的是当前的 MPMS 实例
@@ -118,7 +120,9 @@ def main():
         # optional, close the task queue. queue will be auto closed when join()
         # 关闭任务队列,可选. 在join()的时候会自动关闭
         # m.close()
-
+        while len(m)>10:
+            myprint("len(m)="+str(len(m)))
+            sleep(1)
         # close task queue and wait all workers and handler to finish
         # 等待全部任务及全部结果处理完成
         m.join()

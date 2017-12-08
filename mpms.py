@@ -304,3 +304,10 @@ class MPMS(object):
         for i in range(self.processes_count * self.threads_count):
             self.task_q.put((StopIteration, (), {}))
         self.task_queue_closed = True
+
+    def __len__(self):
+        """
+        Return length of unfinished task queue
+        """
+        
+        return len(self.running_tasks)
